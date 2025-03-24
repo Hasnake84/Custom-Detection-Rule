@@ -9,54 +9,80 @@ Objective:
 The organization's security team has decided to simulate a malware attack (EICAR test file) to evaluate the effectiveness of Microsoft Defender for Endpoint and Sentinel in detecting and responding to such threats. 
 
 ## Objectives
-- Create and implement a custom detection rule in Microsoft Sentinel to detect specific PowerShell commands such as "Execution PolicyBypass  and Invoke-WebRequest.
-- Confirm that Defender for Endpoint successfully detects the suspicious activity.
+- Create and implement a custom detection rule in Microsoft Sentinel and Defender for Endpoint to detect specific PowerShell commands such as "Execution PolicyBypass  and Invoke-WebRequest.
+- Confirm that Sentinel and Defender for Endpoint successfully detects the suspicious activity.
 - Verify that Sentinel collects and correlates the logs to generate actionable alerts.
 ---
 
 ### **Tools and Resources**  
-- **Azure Virtual Machine** (Windows Server or Windows 10/11)  
+- **Azure Virtual Machine** (Windows11)  
 - **Microsoft Defender for Endpoint (EDR)** enabled and configured  
 - **Microsoft Sentinel** for log aggregation and analysis  
 - **EICAR Test File** (Safe and harmless malware simulation)  
 
 ---
 
-### **Step 1: Prepare the Environment**  
-1. **Set Up an Azure Virtual Machine (VM):**
+### Prepare the Environment 
+ **Set Up an Azure Virtual Machine (VM):**
    - Launch an Azure VM with Windows OS.
    - Ensure the VM has proper network security group (NSG) rules for remote access.  
 
-2. **Enable Microsoft Defender for Endpoint (EDR):**
+ **Enable Microsoft Defender for Endpoint (EDR):**
    - Install and configure the Defender agent on the VM.
    - Verify that real-time protection is active.
-
-3. **Integrate the VM with Microsoft Sentinel:**
+ 
+ **Integrate the VM with Microsoft Sentinel:**
    - Connect Defender to Microsoft Sentinel using the **Log Analytics Workspace** for centralized log collection and monitoring.
 
+ ### Create Alert Rule in Microsoft Sentinel:
+      - Sentinel > Analytics > Scheduled Query Rule > Create Alert Rule
+       - Rule Name: PowerShell Suspicious Web Request 🚩
+       - Description: Detects PowerShell malicious executions 📥.
+   #### KQL Query
+      DeviceProcessEvents
+      | where DeviceName == TargetDevice
+      | where FileName == "powershell.exe"
+      | where ProcessCommandLine has_all ("ExecutionPolicy Bypass", "Invoke-WebRequest")
+      | where InitiatingProcessAccountName != "system"
+ 
+<a href="https://imgur.com/zK3FnfW"><img src="https://i.imgur.com//zK3FnfW.png" tB2TqFcLitle="source: imgur.com" /></a>
+   
+### Create a Custom Detection Rule on Defender for Endpoint
+Defender for Endpoint > Hunting > Advanced Hunting > in the query editor window:
+   #### KQL Query
+     let target_machine = "hewindows";
+     DeviceNetworkEvents  
+     | where DeviceName == target_machine
+     | where InitiatingProcessCommandLine has_all ("ExecutionPolicy Bypass", "Invoke-WebRequest")
+     | where InitiatingProcessAccountName != "system"
 
-### **Step 2: Simulate the Malware Incident**  
-1. **Download the EICAR Test File**:  
+ ### Simulate the Malware Incident by downloading the EICAR Test File:  
    - Run the following command in PowerShell to safely simulate a malware attack:  
      ```powershell
      powershell.exe -ExecutionPolicy Bypass -Command Invoke-WebRequest -Uri https://secure.eicar.org/eicar.com.txt -OutFile C:\test\eicar.com
      ```
      _Note: The EICAR test file is specifically designed for antivirus testing and poses no actual harm._
 
-2. **Trigger Detection**:  
-   - Attempt to execute the EICAR file on the VM. Defender for Endpoint (EDR) should detect and block the file.
+ <a href="https://imgur.com/w1nOHRr"><img src="https://i.imgur.com//w1nOHRr.png" tB2TqFcLitle="source: imgur.com" /></a>
+
+2. **Trigger Detection**:
+   - Downloading the EICAR file on the VM. Defender for Endpoint should trigger an alert for **Suspicious file**
+   - Test the rule by executing PowerShell commands on the VM and ensure the rule fires correctly in Sentinel.
+
+<a href="https://imgur.com/12TDERC"><img src="https://i.imgur.com//12TDERC.png" tB2TqFcLitle="source: imgur.com" /></a>
 
 3. **Monitor Alerts**:  
    - Log into Microsoft Sentinel.
    - Query logs and review alerts triggered by the Defender for Endpoint agent.
+
+<a href="https://imgur.com/9CVzbaL"><img src="https://i.imgur.com//9CVzbaL.png" tB2TqFcLitle="source: imgur.com" /></a>
 
 ---
 
 ### **Step 3: Investigate the Incident**  
 1. **Analyze the Alert in Microsoft Sentinel**:  
    - Use **KQL queries** to locate and analyze logs related to the alert.
-   - Example query:  
-     ```kql
+   
      SecurityAlert
      | where AlertName == "Malware detected in file"
      | project AlertName, TimeGenerated, Description, EntityDetails
@@ -103,4 +129,4 @@ By relying on Microsoft Sentinel and Microsoft Defender for Endpoint (EDR), this
 
 ---
 
-Let me know if you'd like any other sections refined further! 🚀
+
