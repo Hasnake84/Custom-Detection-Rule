@@ -4,12 +4,12 @@
 
 ## Scenario: Suspected Malware Infiltration in a Financial Institution
 
-A large financial institution has a hybrid cloud infrastructure with critical workloads hosted in Azure. As part of the organization's cybersecurity strategy, they have implemented Microsoft Defender for Endpoint (EDR) to protect their endpoints and Microsoft Sentinel for centralized threat detection and analysis. Recently, an employee in the Finance Department reported unusual activity on their endpoint, including the appearance of a suspicious PowerShell script running background tasks.
+A large financial institution has a **hybrid cloud infrastructure** with critical workloads hosted in Azure. As part of the organization's cybersecurity strategy, they have implemented **Microsoft Defender for Endpoint** (EDR) to protect their endpoints and **Microsoft Sentinel** for centralized threat detection and analysis. Recently, an employee in the Finance Department reported unusual activity on their endpoint, including the appearance of a **suspicious PowerShell script** running background tasks.
 Objective:
 The organization's security team has decided to simulate a malware attack (EICAR test file) to evaluate the effectiveness of Microsoft Defender for Endpoint and Sentinel in detecting and responding to such threats. 
 
 ## Objectives
-- Create and implement a custom detection rule in Microsoft Sentinel and Defender for Endpoint to detect specific PowerShell commands such as "Execution PolicyBypass  and Invoke-WebRequest.
+- Create and implement a custom detection rule in Microsoft Sentinel and Defender for Endpoint to detect specific PowerShell commands such as **"Execution PolicyBypass**  and **Invoke-WebRequest**.
 - Confirm that Sentinel and Defender for Endpoint successfully detects the suspicious activity.
 - Verify that Sentinel collects and correlates the logs to generate actionable alerts.
 ---
@@ -38,6 +38,7 @@ The organization's security team has decided to simulate a malware attack (EICAR
    - Sentinel > Analytics > Scheduled Query Rule > Create Alert Rule
        - Rule Name: PowerShell Suspicious Web Request 🚩
        - Description: Detects PowerShell malicious executions 📥.
+  
    #### KQL Query
       DeviceProcessEvents
       | where DeviceName == TargetDevice
@@ -49,6 +50,7 @@ The organization's security team has decided to simulate a malware attack (EICAR
    
 ### Create a Custom Detection Rule on Defender for Endpoint
 Defender for Endpoint > Hunting > Advanced Hunting > in the query editor window:
+   
    #### KQL Query
      let target_machine = "hewindows";
      DeviceNetworkEvents  
@@ -74,13 +76,14 @@ Defender for Endpoint > Hunting > Advanced Hunting > in the query editor window:
 **Monitor Alerts**  
    - Query logs and review alerts triggered by the Defender for Endpoint agent.
 
-<a href="https://imgur.com/9CVzbaL"><img src="https://i.imgur.com//9CVzbaL.png" tB2TqFcLitle="source: imgur.com" /></a>
+<a href="https://imgur.com/k8bi2sh"><img src="https://i.imgur.com//k8bi2sh.png" tB2TqFcLitle="source: imgur.com" /></a>
 
 ---
 
 ### Investigate the Incident**  
 **Analyze the Alert in Microsoft Sentinel**:  
-   - Use **KQL queries** to locate and analyze logs related to the alert.
+
+**KQL queries** to locate and analyze logs related to the alert.
    
      SecurityAlert
      | where AlertName == "Suspicious"
@@ -135,9 +138,6 @@ DeviceNetworkEvents
  - While default rules in Defender and Sentinel provide strong coverage, creating custom detection rules for specific scenarios, like monitoring suspicious PowerShell commands, adds another layer of precision in detecting potential threats.
  - The integration between Sentinel and Defender for Endpoint ensures comprehensive visibility, allowing faster threat correlation and response.
  - Simulations like these highlight potential gaps in detection, enabling iterative improvements in detection rules and workflows.
-
-
----
 
 ## Summary
 This project successfully demonstrated how to simulate, detect, and respond to a malware incident using Microsoft Sentinel and Microsoft Defender for Endpoint (EDR). By combining proactive detection rules and incident response workflows, highlighted key aspects of modern threat hunting and response. 
